@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hellosaanvika
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: hellosaanvika
+  template:
+    metadata:
+      labels:
+        app: hellosaanvika
+    spec:
+      containers:
+        - name: app
+          image: docker.io/mrrobotthecoder/hellosaanvika:1.0.0
+          ports:
+            - containerPort: 3000
+          # TODO: Add CPU/memory requests & limits via Kustomize overlays
