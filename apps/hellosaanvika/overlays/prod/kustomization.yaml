@@ -12,3 +12,8 @@ patches:
     target:
       kind: Ingress
       name: hellosaanvika-ingress
+
+  - path: resources-patch.yaml
+    target:
+      kind: Deployment
+      name: hellosaanvika
