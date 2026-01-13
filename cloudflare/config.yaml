@@ -1,0 +1,19 @@
+tunnel: 9f662269-8d8d-4b42-88f6-f6d851a9fbd7
+credentials-file: /etc/cloudflared/credentials.json
+
+ingress:
+  - hostname: hellosaanvika.com
+    service: https://ingress-nginx-controller.ingress-nginx.svc.cluster.local:443
+    originRequest:
+      noTLSVerify: true
+      httpHostHeader: hellosaanvika.com
+      originServerName: hellosaanvika.com
+
+  - hostname: dev.hellosaanvika.com
+    service: https://ingress-nginx-controller.ingress-nginx.svc.cluster.local:443
+    originRequest:
+      noTLSVerify: true
+      httpHostHeader: dev.hellosaanvika.com
+      originServerName: dev.hellosaanvika.com
+
+  - service: http_status:404
