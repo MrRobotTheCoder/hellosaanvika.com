@@ -1,0 +1,21 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: hellosaanvika-ingress
+spec:
+  rules:
+    - host: dev.hellosaanvika.com
+      http:
+        paths:
+          - path : /
+            pathType: Prefix
+            backend:
+              service:
+                name: hellosaanvika-svc
+                port:
+                  number: 80
+  tls:
+  - hosts:
+      - dev.hellosaanvika.com
+    secretName: hellosaanvika-dev-tls                  
+
