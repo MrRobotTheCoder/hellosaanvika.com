@@ -57,21 +57,30 @@ pipeline {
       }
     }
 
-    stage('Kubectl Dry Run Apply') {
+    stage('Kubectl Apply to DEV') {
       steps {
         script {
           String kustomizeDir = "apps/hellosaanvika/overlays/${params.ENV}"
           sh """
-            kubectl apply --dry-run=client --validate=false -k ${kustomizeDir}
+            kubectl apply -k ${kustomizeDir}
           """
         }
       }
     }
+
+    stage('Verify DEV Deployment') {
+      steps {
+        sh '''
+          kubectl -n hellosaanvika-dev get deploy,svc,pods
+        '''
+      }
+    }
+
   }
 
   post {
     success {
-      echo "Phase 3 DEV validation successful"
+      echo "Phase 3 DEV apply successful"
     }
     failure {
       echo "Phase 3 failed - no changes applied to cluster"
