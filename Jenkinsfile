@@ -18,6 +18,19 @@ pipeline {
       }
     }
 
+    stage('Debug Workspace Structure') {
+        steps {
+            sh '''
+                echo "Current directory:"
+                pwd
+                echo "Listing workspace root:"
+                ls -la
+                echo "Recursive apps listing (if exists):"
+                ls -R apps || echo "apps directory not found"
+            '''
+        }
+    }
+    
     stage('Kubernetes Client Check') {
       steps {
         sh '''
