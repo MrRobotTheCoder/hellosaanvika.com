@@ -30,7 +30,7 @@ pipeline {
             '''
         }
     }
-    
+
     stage('Kubernetes Client Check') {
       steps {
         sh '''
@@ -42,7 +42,7 @@ pipeline {
     stage('Kustomize Build (Dry Run)') {
       steps {
         script {
-          String kustomizeDir = "apps/overlays/${params.ENV}"
+          String kustomizeDir = "apps/hellosaanvika/overlays/${params.ENV}"
           sh """
             echo "Rendering manifests from ${kustomizeDir}"
             kubectl kustomize ${kustomizeDir} > /tmp/rendered.yaml
@@ -56,7 +56,7 @@ pipeline {
     stage('Kubectl Dry Run Apply') {
       steps {
         script {
-          String kustomizeDir = "apps/overlays/${params.ENV}"
+          String kustomizeDir = "apps/hellosaanvika/overlays/${params.ENV}"
           sh """
             kubectl apply --dry-run=client -k ${kustomizeDir}
           """
@@ -70,7 +70,7 @@ pipeline {
       echo "Phase 3 DEV validation successful"
     }
     failure {
-      echo "Phase 3 failed – no changes applied to cluster"
+      echo "Phase 3 failed - no changes applied to cluster"
     }
   }
 }
