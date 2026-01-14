@@ -12,7 +12,7 @@ pipeline {
     stages {
         stage('Checkout Verification') {
             steps {
-                echo "Deploying to environment: ${param.ENV}"
+                echo "Deploying to environment: ${params.ENV}"
                 sh 'git --version'
             }
         }
