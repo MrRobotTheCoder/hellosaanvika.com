@@ -41,7 +41,7 @@ pipeline {
                 '''
             }
         }
-
+    }
         post {
             success {
                 echo "Phase 3 DEV validation successful"
@@ -51,5 +51,4 @@ pipeline {
             }
         }
 
-    }
 }
