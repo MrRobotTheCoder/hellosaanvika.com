@@ -32,7 +32,7 @@ pipeline {
                     def kustomizeDir = "apps/overlays/${params.ENV}"                
                 sh '''
                     echo "Rendering manifests from ${KUSTOMIZE_DIR}"
-                    Kustomize build ${KUSTOMIZE_DIR} > /tmp/rendered.yaml
+                    kubectl kustomize build ${KUSTOMIZE_DIR} > /tmp/rendered.yaml
                     echo "Rendered manifest size:"
                     wc -l /tmp/rendered.yaml
                 '''
