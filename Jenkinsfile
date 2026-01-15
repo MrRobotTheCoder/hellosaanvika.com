@@ -83,7 +83,7 @@ pipeline {
       expression { params.ENV == 'prod' }
     }
     steps {
-      scripts {
+      script {
         String kustomizeDir = "apps/hellosaanvika/overlays/prod"
         sh """
           kubectl apply -k ${kustomizeDir}
