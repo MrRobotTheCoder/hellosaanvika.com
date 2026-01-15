@@ -71,27 +71,27 @@ pipeline {
 
   stage('Approve PROD Deployment') {
     when {
-        expression { params.ENV == 'prod'}
-      }
+      expression { params.ENV == 'prod' }
     }
-    steps{
-      input message: 'Approve deployment to PROD?', ok: 'Deploy'        
-      }
-    }
-  
-  stage('Deploy to PROD') {
-    when {
-        expression { params.ENV == 'prod' }
-      }
-    }
-  steps {
-    script {
-      String kustomizeDir = "apps/hellosaanvika/overlays/prod"
-      sh """
-        kubectl apply -k ${kustomizeDir}
-      """
+    steps {
+      input message: 'Approve deployment to PROD?', ok: 'Deploy'
     }
   }
+
+  stage('Deploy to PROD') {
+    when {
+      expression { params.ENV == 'prod' }
+    }
+    steps {
+      scripts {
+        String kustomizeDir = "apps/hellosaanvika/overlays/prod"
+        sh """
+          kubectl apply -k ${kustomizeDir}
+        """
+      }
+    }
+  }
+
  }
 
   post {
