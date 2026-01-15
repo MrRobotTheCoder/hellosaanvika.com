@@ -49,9 +49,7 @@ pipeline {
         script {
           String kustomizeDir = "apps/hellosaanvika/overlays/${params.ENV}"
           sh """
-            kubectl apply \
-              --dry-run=client \              
-              -k ${kustomizeDir}
+            kubectl apply --dry-run=client -k ${kustomizeDir}
           """
         }
       }
