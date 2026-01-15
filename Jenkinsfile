@@ -71,9 +71,7 @@ pipeline {
 
   stage('Approve PROD Deployment') {
     when {
-      allOf {
         expression { params.ENV == 'prod'}
-        branch 'main'
       }
     }
     steps{
@@ -83,9 +81,7 @@ pipeline {
   
   stage('Deploy to PROD') {
     when {
-      allOf {
         expression { params.ENV == 'prod' }
-        branch 'main'
       }
     }
   steps {
@@ -97,7 +93,7 @@ pipeline {
     }
   }
  }
-}
+
   post {
     success {
       echo "Deployment pipeline completed successfully"
@@ -106,4 +102,3 @@ pipeline {
       echo "Pipeline failed — no partial PROD deploys occurred"
     }
   }
-}
