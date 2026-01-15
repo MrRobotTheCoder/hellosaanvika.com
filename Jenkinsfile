@@ -76,7 +76,7 @@ pipeline {
     when {
       allof {
         expression { params.ENV == 'prod'}
-        brain 'main'
+        branch 'main'
       }
     }
     steps{
@@ -87,7 +87,7 @@ pipeline {
   stage('Deploy to PROD') {
     when {
       allof {
-        expresssion { params.ENV == 'prod' }
+        expression { params.ENV == 'prod' }
         branch 'main'
       }
     }
