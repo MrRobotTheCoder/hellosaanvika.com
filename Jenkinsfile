@@ -74,7 +74,7 @@ pipeline {
 
   stage('Approve PROD Deployment') {
     when {
-      allof {
+      allOf {
         expression { params.ENV == 'prod'}
         branch 'main'
       }
@@ -86,7 +86,7 @@ pipeline {
   
   stage('Deploy to PROD') {
     when {
-      allof {
+      allOf {
         expression { params.ENV == 'prod' }
         branch 'main'
       }
