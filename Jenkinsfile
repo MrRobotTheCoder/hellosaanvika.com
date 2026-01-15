@@ -8,8 +8,8 @@ pipeline {
   parameters {
     choice(
       name: 'ENV',
-      choices: ['dev'],
-      description: 'Target environment (DEV only for now)'
+      choices: ['dev', 'prod'],
+      description: 'Target environment (default: dev)'
     )
   }
 
@@ -17,22 +17,10 @@ pipeline {
 
     stage('Checkout Verification') {
       steps {
-        echo "Deploying to environment: ${params.ENV}"
+        echo "Branch: ${env.BRANCH_NAME}"
+        echo "Target environment: ${params.ENV}"
         sh 'git --version'
       }
-    }
-
-    stage('Debug Workspace Structure') {
-        steps {
-            sh '''
-                echo "Current directory:"
-                pwd
-                echo "Listing workspace root:"
-                ls -la
-                echo "Recursive apps listing (if exists):"
-                ls -R apps || echo "apps directory not found"
-            '''
-        }
     }
 
     stage('Kubernetes Client Check') {
@@ -43,47 +31,82 @@ pipeline {
       }
     }
 
-    stage('Kustomize Build (Dry Run)') {
+    stage('Kustomize Build') {
       steps {
         script {
           String kustomizeDir = "apps/hellosaanvika/overlays/${params.ENV}"
           sh """
             echo "Rendering manifests from ${kustomizeDir}"
             kubectl kustomize ${kustomizeDir} > /tmp/rendered.yaml
-            echo "Rendered manifest size:"
             wc -l /tmp/rendered.yaml
           """
         }
       }
     }
 
-    stage('Kubectl Apply to DEV') {
+    stage('Kubectl Dry Run') {
       steps {
         script {
           String kustomizeDir = "apps/hellosaanvika/overlays/${params.ENV}"
           sh """
-            kubectl apply -k ${kustomizeDir}
+            kubectl apply \
+              --dry-run=client \
+              --validation=false \
+              -k ${kustomizeDir}
           """
         }
       }
     }
 
-    stage('Verify DEV Deployment') {
-      steps {
-        sh '''
-          kubectl -n hellosaanvika-dev get deploy,svc,pods
-        '''
+  stage('Deploy to DEV') {
+    when {
+      expression { params.ENV == 'dev'}
+    }
+    steps {
+      script {
+        String kustomizeDir = "apps/hellosaanvika/overlays/dev"
+        sh """
+          kubectl apply -k ${kustomizeDir}
+        """
       }
     }
-
   }
 
+  stage('Approve PROD Deployment') {
+    when {
+      allof {
+        expression { params.ENV == 'prod'}
+        brain 'main'
+      }
+    }
+    steps{
+      input message: 'Approve deployment to PROD?', ok: 'Deploy'        
+      }
+    }
+  
+  stage('Deploy to PROD') {
+    when {
+      allof {
+        expresssion { params.ENV == 'prod' }
+        branch 'main'
+      }
+    }
+  steps {
+    script {
+      String kustomizeDir = "apps/hellosaanvika/overlays/prod"
+      sh """
+        kubectl apply -k ${kustomizeDir}
+      """
+    }
+  }
+ }
+}
   post {
     success {
-      echo "Phase 3 DEV apply successful"
+      echo "Deployment pipeline completed successfully"
     }
     failure {
-      echo "Phase 3 failed - no changes applied to cluster"
+      echo "Pipeline failed — no partial PROD deploys occurred"
     }
   }
 }
