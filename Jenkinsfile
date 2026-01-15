@@ -91,8 +91,7 @@ pipeline {
       }
     }
   }
-
- }
+}
 
   post {
     success {
@@ -102,3 +101,4 @@ pipeline {
       echo "Pipeline failed — no partial PROD deploys occurred"
     }
   }
+}
