@@ -7,6 +7,11 @@ pipeline {
 
   parameters {
     choice(
+      name: 'ACTION',
+      choices: ['deploy', 'rollback'],
+      description: 'Deploy new version or rollback last deployment'
+    )
+    choice(
       name: 'ENV',
       choices: ['dev', 'prod'],
       description: 'Target environment (default: dev)'
@@ -91,6 +96,43 @@ pipeline {
       }
     }
   }
+
+  stage('Approve PROD Rollback') {
+    when {
+      allOf {
+        expression { params.ACTION == 'rollback' }
+        expression { params.ENV == 'prod' }
+      }
+    }
+    steps {
+      input message: 'Approve PROD rollback?'
+    }
+  }
+
+  stage('Rollback Deployment') {
+    when {
+      expression { params.ACTION == 'rollback' }
+    }
+    steps {
+      script {
+        String namespace = params.ENV == 'prod'
+          ? 'hellosaanvika-prod'
+          : 'hellosaanvika-dev'
+
+        sh """
+          echo "Current rollout status:"
+          kubectl rollout status deployment/hellosaanvika -n ${namespace} || true
+
+          echo "Rolling back deployment in ${namespace}"
+          kubectl rollout undo deployment/hellosaanvika -n ${namespace}
+
+          echo "Post-rollback status:"
+          kubectl rollout status deployment/hellosaanvika -n ${namespace}
+        """
+      }
+    }
+  }
+
 }
 
   post {
