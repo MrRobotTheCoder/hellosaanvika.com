@@ -6,6 +6,11 @@ pipeline {
   }
 
   parameters {
+    string(
+      name: 'IMAGE_VERSION',
+      defaultValue: '1.0.0',
+      description: 'Docker image version (eg. 1.0.0)'
+    )
     choice(
       name: 'ACTION',
       choices: ['deploy', 'rollback'],
@@ -25,6 +30,26 @@ pipeline {
         echo "Branch: ${env.BRANCH_NAME}"
         echo "Target environment: ${params.ENV}"
         sh 'git --version'
+      }
+    }
+
+    stage('Build & Push Image (Multi-Arch)') {
+      when {
+        expression { params.ACTION == 'deploy'}
+      }
+      steps {
+        script {
+          def image = "hellosaanvika:${params.IMAGE_VERSION}"
+
+          sh """
+            echo "Building multi-arch image: ${image}"
+
+            docker buildx build \
+            --platform linux/amd64,linux/arm64 \
+            -t ${image} \
+            --push .
+          """
+        }
       }
     }
 
