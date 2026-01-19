@@ -118,6 +118,18 @@ pipeline {
     }
   }
 
+  stage('Validate PROD Image Version') {
+    when {
+      expression { params.ENV == 'prod' }
+    }
+    steps {
+      sh """
+        echo "Validating PROD image version consistency..."
+        kustomize build apps/hellosaanvika/overlays/prod | grep image | grep ${IMAGE_VERSION}
+      """
+    }
+  }
+
   stage('Deploy to PROD') {
     when {
       expression { params.ENV == 'prod' }
