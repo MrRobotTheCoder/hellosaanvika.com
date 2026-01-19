@@ -125,7 +125,7 @@ pipeline {
     steps {
       sh """
         echo "Validating PROD image version consistency..."
-        kustomize build apps/hellosaanvika/overlays/prod | grep image | grep ${IMAGE_VERSION}
+        kubectl kustomize apps/hellosaanvika/overlays/prod | grep image | grep ${IMAGE_VERSION}
       """
     }
   }
