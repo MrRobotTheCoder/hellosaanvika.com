@@ -92,13 +92,15 @@ pipeline {
 
   stage('Deploy to DEV') {
     when {
-      expression { params.ENV == 'dev'}
+      expression { params.ENV == 'dev' && params.ACTION == 'deploy' }
     }
     steps {
       script {
-        String kustomizeDir = "apps/hellosaanvika/overlays/dev"
         sh """
-          kubectl apply -k ${kustomizeDir}
+          echo "Deploying image version ${IMAGE_VERSION} to DEV"
+
+          kubectl apply -k apps/hellosaanvika/overlays/dev \
+            --set-image mrrobotthecoder/hellosaanvika=${IMAGE_NAME}:${IMAGE_VERSION}
         """
       }
     }
