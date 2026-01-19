@@ -99,8 +99,11 @@ pipeline {
         sh """
           echo "Deploying image version ${IMAGE_VERSION} to DEV"
 
-          kubectl apply -k apps/hellosaanvika/overlays/dev \
-            --set-image mrrobotthecoder/hellosaanvika=${IMAGE_NAME}:${IMAGE_VERSION}
+          kubectl apply -k apps/hellosaanvika/overlays/dev
+
+          kubectl set image deployment/hellosaanvika \
+            app=${IMAGE_NAME}:${IMAGE_VERSION} \
+            -n hellosaanvika-dev
         """
       }
     }
