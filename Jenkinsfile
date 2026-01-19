@@ -2,6 +2,7 @@ pipeline {
   agent any
 
   environment {
+    IMAGE_NAME = "mrrobotthecoder/hellosaanvika"
     KUBECONFIG = "/var/lib/jenkins/.kube/config"
   }
 
@@ -35,19 +36,23 @@ pipeline {
 
     stage('Build & Push Image (Multi-Arch)') {
       when {
-        expression { params.ACTION == 'deploy'}
+        expression { params.ACTION == 'deploy' }
       }
       steps {
-        script {
-          def image = "hellosaanvika:${params.IMAGE_VERSION}"
-
+        withCredentials([usernamePassword(
+          credentialsId: 'dockerhub',
+          usernameVariable: 'DOCKER_USER',
+          passwordVariable: 'DOCKER_PASS'
+        )]) {
           sh """
-            echo "Building multi-arch image: ${image}"
+            echo "Logging in to Docker Hub"
+            echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
 
+            echo "Building & pushing multi-arch image: ${IMAGE_NAME}:${IMAGE_VERSION}"
             docker buildx build \
-            --platform linux/amd64,linux/arm64 \
-            -t ${image} \
-            --push .
+              --platform linux/amd64,linux/arm64 \
+              -t ${IMAGE_NAME}:${IMAGE_VERSION} \
+              --push .
           """
         }
       }
