@@ -21,3 +21,13 @@ patches:
     target:
       kind: Deployment
       name: hellosaanvika
+
+  - path: probes-patch.yaml
+    target:
+      kind: Deployment
+      name: hellosaanvika
+
+  - path: rollout-patch.yaml
+    target:
+      kind: Deployment
+      name: hellosaanvika

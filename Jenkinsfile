@@ -157,6 +157,40 @@ pipeline {
     }
   }
 
+  stage('Verify PROD Rollout') {
+    when {
+      expression { params.ENV == 'prod' && params.ACTION == 'deploy' }
+    }
+    steps {
+      sh """
+        echo "Waiting for PROD rollout to complete.."
+        kubectl rollout status deployment/hellosaanvika \
+          -n hellosaanvika-prod \
+          --timeout=180s
+        """
+    }
+  }
+
+  stage('Auto Rollback PROD on Failure') {
+    when {
+      allOf {
+        expression { params.ENV == 'prod' }
+        expression { currentBuild.currentResult == 'FAILURE' }
+      }
+    }
+    steps {
+      sh """
+        echo "PROD deployment failed. Rolling back automatically..."
+        kubectl rollout undo deployment/hellosaanvika \
+          -n hellosaanvika-prod
+
+        echo "Rollback status:"
+        kubectl rollout status deployment/hellosaanvika \
+          -n hellosaanvika-prod
+        """
+    }
+  }
+
   stage('Approve PROD Rollback') {
     when {
       allOf {
