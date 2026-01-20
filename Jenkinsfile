@@ -118,15 +118,28 @@ pipeline {
     }
   }
 
-  stage('Validate PROD Image Version') {
+  stage('Validate PROD Image Immutability') {
     when {
-      expression { params.ENV == 'prod' }
+      expression { params.ENV == 'prod' && params.ACTION == 'deploy' }
     }
     steps {
-      sh """
-        echo "Validating PROD image version consistency..."
-        kubectl kustomize apps/hellosaanvika/overlays/prod | grep image | grep ${IMAGE_VERSION}
-      """
+      sh '''
+        echo " Validating PROD image immutability.. Git is the source of truth!! "
+
+        PROD_TAG=$(grep "newTag:" apps/hellosaanvika/overlays/prod/kustomization.yaml | awk '{print $2}')
+
+        echo "Git-defined PROD image version: $PROD_TAG"
+        echo "Jenkins requested image version: ${IMAGE_VERSION}"
+
+        if [ "$PROD_TAG" != "${IMAGE_VERSION}" ]; then
+          echo "❌ IMMUTABILITY VIOLATION!! ❌"
+          echo "PROD image must be changed via Git only."
+          echo "Update overlays/prod/kustomization.yaml and retry."
+          exit 1
+        fi
+
+        echo "✅ PROD image version is immutable and verified! ✅"
+      '''
     }
   }
 
