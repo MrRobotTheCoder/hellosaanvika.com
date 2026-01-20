@@ -36,7 +36,7 @@ pipeline {
 
     stage('Build & Push Image (Multi-Arch)') {
       when {
-        expression { params.ACTION == 'deploy' }
+        expression { params.ACTION == 'deploy' && params.ENV == 'dev' }
       }
       steps {
         withCredentials([usernamePassword(
