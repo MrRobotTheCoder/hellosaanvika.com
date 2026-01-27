@@ -1,0 +1,55 @@
+groups:
+- name: ingress-slo-burnrate
+  rules:
+
+  - alert: IngressSLOFastBurn
+    expr: |
+      (
+        (
+          sum(rate(nginx_ingress_controller_requests{
+            namespace="hellosaanvika-prod",
+            status=~"5.."
+          }[5m]))
+        )
+        /
+        (
+          sum(rate(nginx_ingress_controller_requests{
+            namespace="hellosaanvika-prod"
+          }[5m]))
+        )
+      )
+      / 0.001
+      > 14.4
+    for: 2m
+    labels:
+      severity: critical
+      service: hellosaanvika
+    annotations:
+      summary: "🔥 Fast error budget burn (hellosaanvika-prod)"
+      description: "Error budget is burning extremely fast. Immediate action required."
+
+  - alert: IngressSLOSlowBurn
+    expr: |
+      (
+        (
+          sum(rate(nginx_ingress_controller_requests{
+            namespace="hellosaanvika-prod",
+            status=~"5.."
+          }[1h]))
+        )
+        /
+        (
+          sum(rate(nginx_ingress_controller_requests{
+            namespace="hellosaanvika-prod"
+          }[1h]))
+        )
+      )
+      / 0.001
+      > 3
+    for: 15m
+    labels:
+      severity: warning
+      service: hellosaanvika
+    annotations:
+      summary: "⚠️ Slow error budget burn (hellosaanvika-prod)"
+      description: "Error budget is slowly burning. Investigation required."
