@@ -1,0 +1,21 @@
+resources:
+  - ../../base
+
+patches:
+  # NodeSelector — Deployments
+  - target:
+      kind: Deployment
+      name: argocd-.*
+    path: patches/control-plane-nodeselector.json
+
+  # NodeSelector — StatefulSet
+  - target:
+      kind: StatefulSet
+      name: argocd-application-controller
+    path: patches/control-plane-nodeselector.json
+
+  # Repo-server resources
+  - target:
+      kind: Deployment
+      name: argocd-repo-server
+    path: patches/repo-server-resources.json
