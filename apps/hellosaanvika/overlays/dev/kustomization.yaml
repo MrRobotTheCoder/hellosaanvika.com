@@ -12,11 +12,7 @@ images:
     newTag: 1.0.2
 
 patches:
-  - path: ingress-patch.yaml
-    target:
-      kind: Ingress
-      name: hellosaanvika-ingress
-
+  
   - path: resources-patch.yaml
     target:
       kind: Deployment
