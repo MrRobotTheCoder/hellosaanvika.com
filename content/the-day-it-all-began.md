@@ -21,6 +21,9 @@ They still do.
 They were written in a moment that cannot be recreated —
 and that is what makes them valuable.
 
+They are preserved here, exactly as they were written —  
+[read the birthday wishes →](/birthday-wishes)
+
 ---
 
 ## Why this page still exists
