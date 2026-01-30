@@ -24,6 +24,8 @@ and stories she may one day read herself.
 
 ## Recent moments
 
+- A quiet reflection on how we chose to celebrate her first birthday  
+  [read →](/reflections/a-simple-first-birthday-at-home)
 - Reflections after the birthday month  
 - Carefully preserving birthday wishes while starting a new chapter  
 - Beginning a new chapter for hellosaanvika.com
