@@ -1,7 +1,3 @@
-# Hello Saanvika!!
-
-A living story of childhood, memories, and milestones.
-
 This website began as a birthday page,  
 and is now growing into a digital journal of moments,  
 reflections, and lessons — written with love.
@@ -13,7 +9,8 @@ reflections, and lessons — written with love.
 On Saanvika’s birthday, this space was created to celebrate love,  
 family, and togetherness.
 
-Those wishes are preserved here as the first chapter of her story.
+Those wishes are preserved here as the first chapter of her story —  
+[read the origin →](/the-day-it-all-began)
 
 ---
 
