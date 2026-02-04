@@ -8,7 +8,14 @@ RUN groupadd -r app && useradd -r -g app app
 COPY package*.json ./
 RUN npm ci
 
-COPY . .
+COPY app ./app
+COPY data ./data
+COPY content ./content
+COPY lib ./lib
+COPY public ./public
+COPY next.config.ts .
+COPY tailwind.config.js .
+
 RUN npm run build
 
 #---------------Runtime Stage---------------
