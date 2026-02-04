@@ -16,3 +16,8 @@ secrets.yaml
 
 # Helm
 charts/*.tgz
+
+#build
+node_modules/
+.next/
+.env
