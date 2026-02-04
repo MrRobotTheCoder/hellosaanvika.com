@@ -7,6 +7,10 @@ resources:
 
 namespace: hellosaanvika-dev
 
+images:
+  - name: docker.io/mrrobotthecoder/hellosaanvika
+    newTag: 1.0.2
+
 patches:
   - path: ingress-patch.yaml
     target:
@@ -14,6 +18,16 @@ patches:
       name: hellosaanvika-ingress
 
   - path: resources-patch.yaml
+    target:
+      kind: Deployment
+      name: hellosaanvika
+
+  - path: probes-patch.yaml
+    target:
+      kind: Deployment
+      name: hellosaanvika
+
+  - path: rollout-patch.yaml
     target:
       kind: Deployment
       name: hellosaanvika

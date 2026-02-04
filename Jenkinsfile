@@ -2,6 +2,7 @@ pipeline {
   agent any
 
   environment {
+    IMAGE_NAME = "mrrobotthecoder/hellosaanvika"
     KUBECONFIG = "/var/lib/jenkins/.kube/config"
   }
 
@@ -35,19 +36,23 @@ pipeline {
 
     stage('Build & Push Image (Multi-Arch)') {
       when {
-        expression { params.ACTION == 'deploy'}
+        expression { params.ACTION == 'deploy' && params.ENV == 'dev' }
       }
       steps {
-        script {
-          def image = "hellosaanvika:${params.IMAGE_VERSION}"
-
+        withCredentials([usernamePassword(
+          credentialsId: 'dockerhub',
+          usernameVariable: 'DOCKER_USER',
+          passwordVariable: 'DOCKER_PASS'
+        )]) {
           sh """
-            echo "Building multi-arch image: ${image}"
+            echo "Logging in to Docker Hub"
+            echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
 
+            echo "Building & pushing multi-arch image: ${IMAGE_NAME}:${IMAGE_VERSION}"
             docker buildx build \
-            --platform linux/amd64,linux/arm64 \
-            -t ${image} \
-            --push .
+              --platform linux/amd64,linux/arm64 \
+              -t ${IMAGE_NAME}:${IMAGE_VERSION} \
+              --push .
           """
         }
       }
@@ -87,13 +92,18 @@ pipeline {
 
   stage('Deploy to DEV') {
     when {
-      expression { params.ENV == 'dev'}
+      expression { params.ENV == 'dev' && params.ACTION == 'deploy' }
     }
     steps {
       script {
-        String kustomizeDir = "apps/hellosaanvika/overlays/dev"
         sh """
-          kubectl apply -k ${kustomizeDir}
+          echo "Deploying image version ${IMAGE_VERSION} to DEV"
+
+          kubectl apply -k apps/hellosaanvika/overlays/dev
+
+          kubectl set image deployment/hellosaanvika \
+            app=${IMAGE_NAME}:${IMAGE_VERSION} \
+            -n hellosaanvika-dev
         """
       }
     }
@@ -108,6 +118,31 @@ pipeline {
     }
   }
 
+  stage('Validate PROD Image Immutability') {
+    when {
+      expression { params.ENV == 'prod' && params.ACTION == 'deploy' }
+    }
+    steps {
+      sh '''
+        echo " Validating PROD image immutability.. Git is the source of truth!! "
+
+        PROD_TAG=$(grep "newTag:" apps/hellosaanvika/overlays/prod/kustomization.yaml | awk '{print $2}')
+
+        echo "Git-defined PROD image version: $PROD_TAG"
+        echo "Jenkins requested image version: ${IMAGE_VERSION}"
+
+        if [ "$PROD_TAG" != "${IMAGE_VERSION}" ]; then
+          echo "❌ IMMUTABILITY VIOLATION!! ❌"
+          echo "PROD image must be changed via Git only."
+          echo "Update overlays/prod/kustomization.yaml and retry."
+          exit 1
+        fi
+
+        echo "✅ PROD image version is immutable and verified! ✅"
+      '''
+    }
+  }
+
   stage('Deploy to PROD') {
     when {
       expression { params.ENV == 'prod' }
@@ -119,6 +154,40 @@ pipeline {
           kubectl apply -k ${kustomizeDir}
         """
       }
+    }
+  }
+
+  stage('Verify PROD Rollout') {
+    when {
+      expression { params.ENV == 'prod' && params.ACTION == 'deploy' }
+    }
+    steps {
+      sh """
+        echo "Waiting for PROD rollout to complete.."
+        kubectl rollout status deployment/hellosaanvika \
+          -n hellosaanvika-prod \
+          --timeout=180s
+        """
+    }
+  }
+
+  stage('Auto Rollback PROD on Failure') {
+    when {
+      allOf {
+        expression { params.ENV == 'prod' }
+        expression { currentBuild.currentResult == 'FAILURE' }
+      }
+    }
+    steps {
+      sh """
+        echo "PROD deployment failed. Rolling back automatically..."
+        kubectl rollout undo deployment/hellosaanvika \
+          -n hellosaanvika-prod
+
+        echo "Rollback status:"
+        kubectl rollout status deployment/hellosaanvika \
+          -n hellosaanvika-prod
+        """
     }
   }
 
