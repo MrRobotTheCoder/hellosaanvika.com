@@ -1,4 +1,36 @@
 import { renderMarkdown } from "@/lib/markdown";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "The day it all began — Hello Saanvika",
+  description:
+    "The first chapter of a quiet journal — where a simple birthday moment became the beginning of something lasting.",
+
+  openGraph: {
+    title: "The day it all began",
+    description:
+      "Where a simple birthday moment quietly became the first chapter of a longer story.",
+    url: "https://hellosaanvika.com/the-day-it-all-began",
+    siteName: "Hello Saanvika",
+    images: [
+      {
+        url: "/og-home.png",
+        width: 1200,
+        height: 630,
+        alt: "The day it all began — Hello Saanvika",
+      },
+    ],
+    type: "article",
+  },
+
+  twitter: {
+    card: "summary_large_image",
+    title: "The day it all began",
+    description:
+      "The first chapter of a quiet journal — where everything started.",
+    images: ["/og-home.png"],
+  },
+};
 
 export default async function TheDayItAllBeganPage() {
   const contentHtml = await renderMarkdown(
@@ -6,18 +38,10 @@ export default async function TheDayItAllBeganPage() {
   );
 
   return (
-    <main className="mx-auto max-w-3xl px-6 py-16">
+    <main className="letter">
       <article
         className="
           prose
-          prose-invert
-          prose-neutral
-          prose-headings:font-semibold
-          prose-headings:tracking-tight
-          prose-h1:text-4xl
-          prose-h2:text-2xl
-          prose-p:leading-relaxed
-          prose-li:leading-relaxed
         "
         dangerouslySetInnerHTML={{ __html: contentHtml }}
       />

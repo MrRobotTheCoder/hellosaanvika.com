@@ -1,6 +1,38 @@
 import fs from "fs";
 import path from "path";
 import { renderMarkdown } from "@/lib/markdown";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Birthday wishes — Hello Saanvika",
+  description:
+    "Messages written in a fleeting moment — preserved exactly as they were, as a reminder of how deeply Saanvika was loved from the very beginning.",
+
+  openGraph: {
+    title: "Birthday wishes for Saanvika",
+    description:
+      "Words written without filters or planning — just honest wishes, preserved as they were.",
+    url: "https://hellosaanvika.com/birthday-wishes",
+    siteName: "Hello Saanvika",
+    images: [
+      {
+        url: "/og-home.png",
+        width: 1200,
+        height: 630,
+        alt: "Birthday wishes — Hello Saanvika",
+      },
+    ],
+    type: "article",
+  },
+
+  twitter: {
+    card: "summary_large_image",
+    title: "Birthday wishes for Saanvika",
+    description:
+      "Honest words written in a fleeting moment — preserved with care.",
+    images: ["/og-home.png"],
+  },
+};
 
 type Wish = {
   name: string;
@@ -21,34 +53,26 @@ export default async function BirthdayWishesPage() {
   const wishes: Wish[] = JSON.parse(wishesRaw);
 
   return (
-    <main className="mx-auto max-w-3xl px-6 py-16">
+    <main className="letter wishes">
       {/* Intro */}
       <article
         className="
-          prose
-          prose-invert
-          prose-neutral
-          prose-headings:font-semibold
-          prose-headings:tracking-tight
-          prose-p:leading-relaxed
+          prose          
         "
         dangerouslySetInnerHTML={{ __html: introHtml }}
       />
 
       {/* Wishes */}
-      <section className="mt-16 space-y-10">
+      <section className="mt-16">
         {wishes.map((wish, index) => (
-          <blockquote
-            key={index}
-            className="border-l-2 border-neutral-700 pl-6"
-          >
-            <p className="text-lg leading-relaxed text-neutral-100">
+          <div key={index} className="wish">
+            <p className="wish-message">
               {wish.message}
             </p>
-            <footer className="mt-2 text-sm text-neutral-400">
+            <div className="wish-signature">
               — {wish.name}
-            </footer>
-          </blockquote>
+            </div>
+          </div>
         ))}
       </section>
     </main>
