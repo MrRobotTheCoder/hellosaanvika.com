@@ -15,6 +15,8 @@ COPY lib ./lib
 COPY public ./public
 COPY next.config.ts .
 COPY tailwind.config.js .
+COPY tsconfig.json .
+COPY next.config.ts .
 
 RUN npm run build
 
