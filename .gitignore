@@ -18,4 +18,6 @@ secrets.yaml
 charts/*.tgz
 
 #build
+node_modules/
 .next/
+.env
